@@ -26,28 +26,32 @@ const OTPVerification = ({ inputType, autoFocusIndex }) => {
     }
   };
 
-  if ("OTPCredential" in window) {
-    try {
-      otpAutoReadSignalRef.current = new AbortController();
-      console.log(1);
-      navigator.credentials
-        .get({
-          abort: otpAutoReadSignalRef.current.signal,
-          otp: { transport: ["sms"] },
-        })
-        .then((content) => {
-          console.log(2);
-          if (content && content.code) {
-            console.log(3);
-            console.log(content);
-            fillOTP(content.code);
-            console.log(4);
-          }
-        });
-    } catch (error) {
-      console.log(error);
+  const checkAutoReadOTP = () => {
+    if ("OTPCredential" in window) {
+      try {
+        const ac = new AbortController();
+        console.log(1);
+        navigator.credentials
+          .get({
+            otp: { transport: ["sms"] },
+            signal: ac.signal,
+          })
+          .then((content) => {
+            if (content && content.code) {
+              console.log(21);
+              console.log(content);
+              fillOTP(content.code);
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
+  };
+
+  useEffect(() => {
+    checkAutoReadOTP();
+  }, []);
 
   return (
     <React.Fragment>
