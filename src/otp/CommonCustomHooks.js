@@ -47,33 +47,39 @@ export const useUpdateProgress = () => {
 
 export function autoReadSMS(cb) {
   // used AbortController with setTimeout so that WebOTP API (Autoread sms) will get disabled after 1min
-   const signal = new AbortController();
-   setTimeout(() => {
-     signal.abort();
-   }, 1 * 60 * 2000);
-   async function main() {
-     if ('OTPCredential' in window) {
-        try {
-           if (navigator.credentials) {
-              try {
-                 await navigator.credentials
-                 .get({ abort: signal, otp:{ transport: ['sms']}})
-                 .then(content => {
-                   if (content && content.code) {
-                     cb(content.code);
-                   }
-                 })
-                 .catch(e => console.log(e));
-              } 
-              catch (e) {
-                return;
-              }
-           }
-        } 
-        catch (err) {
-          console.log(err);
+  const signal = new AbortController();
+  setTimeout(() => {
+    signal.abort();
+  }, 1 * 60 * 2000);
+
+  console.log(1);
+  async function main() {
+    if ("OTPCredential" in window) {
+      console.log(2);
+      try {
+        if (navigator.credentials) {
+          console.log(3);
+          try {
+            await navigator.credentials
+              .get({ abort: signal, otp: { transport: ["sms"] } })
+              .then((content) => {
+                console.log(4);
+                console.log(content);
+                if (content && content.code) {
+                  console.log(5);
+                  cb(content.code);
+                  console.log(content.code);
+                }
+              })
+              .catch((e) => console.log(e));
+          } catch (e) {
+            return;
+          }
         }
+      } catch (err) {
+        console.log(err);
       }
-   }
-   main();
+    }
   }
+  main();
+}
