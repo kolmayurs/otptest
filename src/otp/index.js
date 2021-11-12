@@ -5,7 +5,7 @@ import OTPHeader from "./OTPHeader";
 import OTPContainer from "./OTPContainer";
 import OTPFooter from "./OTPFooter";
 import { OTPVerificationContainer } from "./style";
-import { useOTPChange } from "./CommonCustomHooks";
+import { useOTPChange, autoReadSMS } from "./CommonCustomHooks";
 
 const OTPVerification = ({ inputType, autoFocusIndex }) => {
   const [otpError, setOTPError] = useState("");
@@ -24,31 +24,9 @@ const OTPVerification = ({ inputType, autoFocusIndex }) => {
     }
   };
 
-  if ('OTPCredential' in window) {
-    window.addEventListener('DOMContentLoaded', e => {
-      const input = document.querySelector('input[autocomplete="one-time-code"]');
-      console.log(1)
-      if (!input) return;
-      const ac = new AbortController();
-      const form = input.closest('form');
-      console.log(2)
-      if (form) {
-        form.addEventListener('submit', e => {
-          ac.abort();
-        });
-      }
-      navigator.credentials.get({
-        otp: { transport:['sms'] },
-        signal: ac.signal
-      }).then(otp => {
-        console.log(3)
-        input.value = otp.code;
-        if (form) form.submit();
-      }).catch(err => {
-        console.log(err);
-      });
-    });
-  }
+  useEffect(()=>{
+    autoReadSMS(fillOTP)
+  },[])
 
   return (
     <React.Fragment>
@@ -57,10 +35,6 @@ const OTPVerification = ({ inputType, autoFocusIndex }) => {
           headerText="OTP Verification"
           subTitle="OTP sent to 9920176209"
         />
-        <form>
-          <input autocomplete="one-time-code" required />
-          <input type="submit" />
-        </form>
         <OTPContainer
           inputType={inputType}
           autoFocusIndex={autoFocusIndex}
